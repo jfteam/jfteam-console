@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!--只扫描web包下所有的注解-->
+    <context:component-scan base-package="org.jfteam.**.web" use-default-filters="false">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+        <context:include-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+    </context:component-scan>
+
+    <!--启用mvc注解,完成请求和注解POJO的映射 -->
+    <mvc:annotation-driven content-negotiation-manager="contentNegotiationManagerFactoryBean">
+        <mvc:message-converters>
+            <ref bean="mappingJackson_hmc"/>
+            <ref bean="byteArray_hmc"/>
+            <ref bean="string_hmc"/>
+            <ref bean="resource_hmc"/>
+            <ref bean="source_hmc"/>
+            <ref bean="jaxb2RootElement_hmc"/>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <bean id="mappingJackson_hmc" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+        <property name="supportedMediaTypes">
+            <util:list>
+                <value>text/html; charset=UTF-8</value>
+                <value>application/json;charset=UTF-8</value>
+            </util:list>
+        </property>
+        <property name="objectMapper">
+            <bean class="com.fasterxml.jackson.databind.ObjectMapper">
+                <property name="dateFormat">
+                    <bean class="java.text.SimpleDateFormat">
+                        <constructor-arg type="java.lang.String" value="yyyy-MM-dd HH:mm:ss"/>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+    </bean>
+    <bean id="string_hmc" class="org.springframework.http.converter.StringHttpMessageConverter">
+        <property name="supportedMediaTypes">
+            <util:list>
+                <value>text/html; charset=UTF-8</value>
+                <value>application/json;charset=UTF-8</value>
+            </util:list>
+        </property>
+    </bean>
+    <bean id="byteArray_hmc" class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>
+    <bean id="resource_hmc" class="org.springframework.http.converter.ResourceHttpMessageConverter"/>
+    <bean id="source_hmc" class="org.springframework.http.converter.xml.SourceHttpMessageConverter"/>
+    <bean id="jaxb2RootElement_hmc" class="org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter"/>
+
+    <!-- 根据请求的后缀,进入不同的请求 -->
+    <bean id="contentNegotiationManagerFactoryBean" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+        <property name="ignoreAcceptHeader" value="true"/>
+        <property name="defaultContentType" value="text/html"/>
+        <property name="mediaTypes">
+            <map>
+                <entry key="html" value="text/html"/>
+                <entry key="json" value="application/json"/>
+                <entry key="xml" value="application/xml"/>
+            </map>
+        </property>
+    </bean>
+
+    <!--处理静态文件-->
+    <mvc:default-servlet-handler/>
+
+    <!--通用视图jsp解析器 -->
+    <bean id="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/template/"/>
+        <property name="suffix" value=".jsp"/><!--可为空,方便实现自已的依据扩展名来选择视图解释类的逻辑 -->
+        <property name="viewClass" value="org.springframework.web.servlet.view.InternalResourceView"/>
+        <property name="order" value="0"/>
+    </bean>
+
+    <!--上传文件设置 -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="114572800"/>
+        <property name="defaultEncoding" value="UTF-8"/>
+    </bean>
+</beans>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--monitorInterval指log4j2每隔1800秒(半小时),自动监控该配置文件是否有变化,如果变化,则自动根据文件内容重新配置-->
+<Configuration status="WARN" monitorInterval="1800">
+    <Properties>
+        <Property name="appName">jfteam-console</Property>
+        <Property name="logPath">/Users/fengwenping/IdeaProjects/applogs/${appName}/logs</Property>
+        <Property name="logPatternFormat">%d{yyyy-MM-dd HH:mm:ss.SSS} %level [%thread] [%file:%line] - %msg%n</Property>
+        <Property name="LOG_PATTERN_FORMAT">%d{yyyy-MM-dd HH:mm:ss.SSS} %5p [%15.15t] %-40.40c{1.} - %m%n</Property>
+    </Properties>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${LOG_PATTERN_FORMAT}"/>
+        </Console>
+        <RollingFile name="root" fileName="${logPath}/root.log" filePattern="${logPath}/$${date:yyyy-MM}/root-%d{yyyy-MM-dd}-%i.log.gz" append="true">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %level [%thread] [%file:%line] - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
+                <SizeBasedTriggeringPolicy size="10MB"/>
+            </Policies>
+            <!--表示压缩包最多保留30个-->
+            <DefaultRolloverStrategy max="30"/>
+        </RollingFile>
+        <RollingFile name="app" fileName="${logPath}/app.log" filePattern="${logPath}/$${date:yyyy-MM}/app-%d{yyyy-MM-dd}-%i.log.gz" append="true">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %level [%thread] [%file:%line] - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
+                <SizeBasedTriggeringPolicy size="10MB"/>
+            </Policies>
+            <!--表示压缩包最多保留30个-->
+            <DefaultRolloverStrategy max="30"/>
+        </RollingFile>
+        <RollingFile name="sql" fileName="${logPath}/sql.log" filePattern="${logPath}/$${date:yyyy-MM}/sql-%d{yyyy-MM-dd}-%i.log.gz" append="true">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %level [%thread] [%file:%line] - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
+                <SizeBasedTriggeringPolicy size="10MB"/>
+            </Policies>
+            <!--表示压缩包最多保留30个-->
+            <DefaultRolloverStrategy max="30"/>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Logger name="org.jfteam" level="info" additivity="true">
+            <AppenderRef ref="app"/>
+        </Logger>
+
+        <!--log4jdbc start-->
+        <Logger name="jdbc.sqlonly" level="error" additivity="false">
+            <AppenderRef ref="sql"/>
+        </Logger>
+        <Logger name="jdbc.audit" level="error" additivity="false">
+            <AppenderRef ref="sql"/>
+        </Logger>
+        <Logger name="jdbc.resultset" level="error" additivity="false">
+            <AppenderRef ref="sql"/>
+        </Logger>
+        <Logger name="jdbc.resultsettable" level="error" additivity="false">
+            <AppenderRef ref="sql"/>
+        </Logger>
+        <Logger name="jdbc.connection" level="error" additivity="false">
+            <AppenderRef ref="sql"/>
+        </Logger>
+        <Logger name="jdbc.sqltiming" level="info" additivity="true">
+            <AppenderRef ref="sql"/>
+        </Logger>
+        <!--log4jdbc end-->
+        <!--TRACE < DEBUG < INFO < WARN < ERROR < FATAL-->
+        <Root level="info">
+            <AppenderRef ref="root"/>
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</Configuration>
