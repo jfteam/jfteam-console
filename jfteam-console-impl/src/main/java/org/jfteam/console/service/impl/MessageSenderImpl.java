@@ -48,7 +48,7 @@ public class MessageSenderImpl implements MessageSender {
         props.put("serializer.class", SERIALIZER_CLASS);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
-        Producer<String, String> producer = new KafkaProducer(props);
+        Producer<String, String> producer = new KafkaProducer<String, String>(props);
         ProducerRecord<String, String> record = new ProducerRecord<>(topic, message);
         producer.send(record, (recordMetadata, exception) -> {
             if (exception != null) {
@@ -56,6 +56,7 @@ public class MessageSenderImpl implements MessageSender {
                 return;
             }
         });
+        producer.close();
         return Boolean.TRUE;
     }
 }
