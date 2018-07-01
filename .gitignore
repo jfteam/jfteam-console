@@ -1,3 +1,15 @@
+#maven
+target
+
+#IDEA配置
 .idea
 *.iml
-target
+
+
+#Eclipse配置
+.settings
+.project
+.classpath
+.factorypath
+
+.DS_Store
